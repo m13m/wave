@@ -64,14 +64,15 @@ defmodule WaveWeb.ChatLive do
 
   @impl true
   def handle_event("create", %{"message" => params}, socket) do
+    html = Helpers.to_html!(params["data"]) |> Helpers.santize_message()
+
     params =
       params
       |> Map.put("user_id", socket.assigns.current_user.id)
       |> Map.put("room_id", socket.assigns.room.id)
+      |> Map.put("data", html)
 
-    html = Helpers.to_html!(params["data"]) |> Helpers.santize_message()
-
-    case Chats.create_message(Map.merge(params, %{"data" => html})) do
+    case Chats.create_message(params) do
       {:ok, _message} ->
         {:noreply, socket}
 

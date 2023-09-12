@@ -1,4 +1,4 @@
-<nav class="bg-[#292828] mt-24 h-screen w-24 fixed z-50 transition-all hover:w-80 focus:w-80 hover:text-2xl">
+<nav class="bg-[#292828] fixed h-screen w-24  z-50 transition-all hover:w-80 focus:w-80 hover:text-2xl">
   <h1 class="text-white hover:bg-yellow-200 w-full hover:text-black pl-2 pt-6 pb-6 font-semibold">
     Channels
   </h1>
@@ -16,13 +16,7 @@
 
   <div class="flex-1 w-full flex flex-col overflow-auto  scroll-smooth">
     <%= if not @end_of_timeline? do %>
-      <div
-        id="infinite-scroll-marker"
-        class="w-10 h-10 z-10"
-        phx-hook="InfiniteScroll"
-        data-page={@page}
-      >
-      </div>
+      <div id="infinite-scroll-marker" class="" phx-hook="InfiniteScroll" data-page={@page}></div>
     <% end %>
 
     <.message_card messages={@streams.messages} />
