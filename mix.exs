@@ -56,7 +56,8 @@ defmodule Wave.MixProject do
       {:timex, "~> 3.7"},
       {:broadway, "~> 1.0"},
       {:dns_cluster, "~> 0.1.0"},
-      {:req, "~> 0.4.0"}
+      {:req, "~> 0.4.0"},
+      {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false}
     ]
   end
 
