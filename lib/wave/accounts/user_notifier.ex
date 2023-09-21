@@ -8,7 +8,7 @@ defmodule Wave.Accounts.UserNotifier do
     email =
       new()
       |> to(recipient)
-      |> from({"Wave", "contact@example.com"})
+      |> from({"Wave", "hey@waveapp.fly.dev"})
       |> subject(subject)
       |> text_body(body)
 
