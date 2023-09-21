@@ -200,11 +200,11 @@ defmodule WaveWeb.UserAuth do
   they use the application at all, here would be a good place.
   """
   def require_authenticated_user(conn, _opts) do
-    if conn.assigns[:current_user] do
+    if conn.assigns[:current_user] && conn.assigns[:current_user].confirmed_at do
       conn
     else
       conn
-      |> put_flash(:error, "You must log in to access this page.")
+      |> put_flash(:error, "You must log in or confirm your account to access this page")
       |> maybe_store_return_to()
       |> redirect(to: ~p"/users/log_in")
       |> halt()
