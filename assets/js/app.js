@@ -24,7 +24,6 @@ import topbar from "../vendor/topbar"
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 
-
 import easyMDE from "easymde"
 
 let Hooks = {}

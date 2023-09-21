@@ -15,7 +15,16 @@ defmodule Wave.Chats do
     Repo.all(Room)
   end
 
+  def change_room(attrs \\ %{}) do
+    %Room{}
+    |> Room.changeset(attrs)
+  end
+
   def get_room(room_id), do: Repo.get(Room, room_id)
+
+  def get_room!(name) when is_binary(name) do
+    Repo.get_by!(Room, name: name)
+  end
 
   # change it to keyset pagination
   def list_messages(room_id, opts) do
@@ -58,7 +67,12 @@ defmodule Wave.Chats do
   end
 
   defp broadcast_new_message(message) do
-    Phoenix.PubSub.broadcast!(Wave.PubSub, "new_message", {:new_message, message})
+    Phoenix.PubSub.broadcast!(
+      Wave.PubSub,
+      "new_message#{message.room_id}",
+      {:new_message, message}
+    )
+
     message
   end
 end

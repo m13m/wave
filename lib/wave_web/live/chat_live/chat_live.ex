@@ -21,27 +21,31 @@ defmodule WaveWeb.ChatLive do
   end
 
   @impl true
-  def handle_params(%{"room_id" => room_id}, _uri, socket) do
+  def handle_params(%{"name" => name}, _uri, socket) do
+    room = Chats.get_room!(name)
+
     changeset =
       Chats.change_message(%{
-        room_id: room_id,
+        room_id: room.id,
         user_id: socket.assigns.current_user.id,
         data: ""
       })
 
     if connected?(socket) do
-      Phoenix.PubSub.subscribe(Wave.PubSub, "new_message")
+      Phoenix.PubSub.subscribe(Wave.PubSub, "new_message#{room.id}")
     end
 
-    room = Chats.get_room(room_id)
+    room_form = Chats.change_room() |> to_form()
 
     socket =
       socket
       |> assign(changeset: changeset)
+      |> assign(room_form: room_form)
       |> assign(room: room)
       |> assign(page: 1, per_page: 10)
       |> paginate_messages(1)
       |> assign(end_of_timeline?: false)
+      |> assign(:ip, get_ip())
 
     {:noreply, socket}
   end
@@ -58,8 +62,20 @@ defmodule WaveWeb.ChatLive do
   end
 
   @impl true
-  def handle_event("switch-room", _params, socket) do
-    {:noreply, socket}
+  def handle_event("create-room", %{"room" => room_params}, socket) do
+    case Chats.create_room(room_params) do
+      {:ok, room} ->
+        {:noreply, push_navigate(socket, to: ~p"/chat/#{room.id}")}
+
+      {:error, changeset} ->
+        IO.inspect(changeset)
+        {:noreply, assign(socket, room_form: to_form(changeset))}
+    end
+  end
+
+  @impl true
+  def handle_event("switch-room", %{"room" => room_name}, socket) do
+    {:noreply, push_navigate(socket, to: ~p"/chat/#{room_name}")}
   end
 
   @impl true
@@ -77,7 +93,6 @@ defmodule WaveWeb.ChatLive do
         {:noreply, socket}
 
       {:error, changeset} ->
-        IO.inspect(changeset)
         {:noreply, assign(socket, changeset: changeset)}
     end
   end
@@ -132,5 +147,10 @@ defmodule WaveWeb.ChatLive do
     socket = stream_insert(socket, :messages, new_message, at: -1)
 
     {:noreply, socket}
+  end
+
+  defp get_ip do
+    %{"origin" => ip} = Req.get!("https://httpbin.org/ip").body
+    ip
   end
 end

@@ -21,5 +21,7 @@ defmodule Wave.Chats.Schema.Room do
     room
     |> cast(attrs, [:name, :visibility])
     |> validate_required([:name, :visibility])
+    |> validate_length(:name, min: 1, max: 80)
+    |> unique_constraint(:name)
   end
 end

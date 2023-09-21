@@ -1,17 +1,46 @@
-<nav class="bg-[#292828] fixed h-screen w-24  z-50 transition-all hover:w-80 focus:w-80 hover:text-2xl">
-  <h1 class="text-white hover:bg-yellow-200 w-full hover:text-black pl-2 pt-6 pb-6 font-semibold">
-    Channels
-  </h1>
+<nav class="bg-[#292828] fixed h-screen w-26  z-50 transition-all hover:w-80 focus:w-80 hover:text-2xl">
+  <div class="flex ">
+    <h1 class="text-white w-full pl-2 pt-6 pb-6 font-semibold">
+      Channels 
+    </h1>
+
+    <button phx-click={show_modal("create-room")}>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="grey"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-6 h-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+    </button>
+  </div>
+
+  <.modal id="create-room">
+    <.simple_form for={@room_form} phx-submit="create-room">
+      <.input field={@room_form[:name]} type="text" label="Name" />
+      <:actions>
+        <.button>Create</.button>
+      </:actions>
+    </.simple_form>
+  </.modal>
 
   <div :for={room <- @rooms} id={"room_#{room.id}"} class="bg-yellow-200">
-    <a href="#" phx-click="switch-room" phx-value-room={room.id}>
-      # <%= room.name %>
+    <a href="#" phx-click="switch-room" phx-value-room={room.name}>
+      # <%= room.name %> 
     </a>
   </div>
 </nav>
+
 <section class="flex flex-1 flex-col w-[calc(100%-6rem)]  bg-[#6b6a6a] ml-auto h-[calc(100%-20rem)]">
   <h1 class="top-0 fixed w-full bg-[#232323] text-2xl text-center py-6 text-white drop-shadow-2xl">
-    # <%= @room.name %>
+    # <%= @room.name %> with <%= @ip %> IP address
   </h1>
 
   <div class="flex-1 w-full flex flex-col overflow-auto  scroll-smooth">

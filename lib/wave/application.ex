@@ -14,6 +14,7 @@ defmodule Wave.Application do
       Wave.Repo,
       # Start the PubSub system
       {Phoenix.PubSub, name: Wave.PubSub},
+      {DNSCluster, query: Application.get_env(:wave, :dns_cluster_query) || :ignore},
       # Start Finch
       {Finch, name: Wave.Finch},
       # Start the Endpoint (http/https)

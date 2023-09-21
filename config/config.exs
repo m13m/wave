@@ -12,6 +12,8 @@ config :wave,
   migration_primary_key: [name: :id, type: :binary_id],
   migration_foreign_key: [column: :id, type: :binary_id]
 
+config :wave, Wave.Repo, migration_lock: :pg_advisory_lock
+
 # Configures the endpoint
 config :wave, WaveWeb.Endpoint,
   url: [host: "localhost"],

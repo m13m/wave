@@ -28,7 +28,8 @@ defmodule WaveWeb.Router do
 
     live_session :default,
       on_mount: [{WaveWeb.UserAuth, :ensure_authenticated}] do
-      live "/chat/:room_id", ChatLive
+      live "/chat", ChatLive
+      live "/chat/:name", ChatLive
     end
   end
 

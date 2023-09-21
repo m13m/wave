@@ -53,7 +53,10 @@ defmodule Wave.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:earmark, "~> 1.4"},
       {:html_sanitize_ex, "~> 1.4"},
-      {:timex, "~> 3.7"}
+      {:timex, "~> 3.7"},
+      {:broadway, "~> 1.0"},
+      {:dns_cluster, "~> 0.1.0"},
+      {:req, "~> 0.4.0"}
     ]
   end
 
