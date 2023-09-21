@@ -7,6 +7,7 @@ defmodule Wave.Chats.Schema.Room do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
+  @derive {Phoenix.Param, key: :name}
   schema "rooms" do
     field :name, :string
     field :visibility, Ecto.Enum, values: [:public, :private], default: :public

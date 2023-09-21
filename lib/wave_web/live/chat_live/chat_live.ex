@@ -65,7 +65,7 @@ defmodule WaveWeb.ChatLive do
   def handle_event("create-room", %{"room" => room_params}, socket) do
     case Chats.create_room(room_params) do
       {:ok, room} ->
-        {:noreply, push_navigate(socket, to: ~p"/chat/#{room.id}")}
+        {:noreply, push_navigate(socket, to: ~p"/chat/#{room}")}
 
       {:error, changeset} ->
         IO.inspect(changeset)
