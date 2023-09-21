@@ -40,6 +40,7 @@ defmodule WaveWeb.ChatLive do
     socket =
       socket
       |> assign(changeset: changeset)
+      |> assign(page_title: room.name)
       |> assign(room_form: room_form)
       |> assign(room: room)
       |> assign(page: 1, per_page: 10)
