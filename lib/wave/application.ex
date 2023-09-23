@@ -14,11 +14,16 @@ defmodule Wave.Application do
       Wave.Repo,
       # Start the PubSub system
       {Phoenix.PubSub, name: Wave.PubSub},
+
+      # Auto discovery of other nodes on fly.io app namespace and forming the erlang cluster 
       {DNSCluster, query: Application.get_env(:wave, :dns_cluster_query) || :ignore},
       # Start Finch
       {Finch, name: Wave.Finch},
       # Start the Endpoint (http/https)
-      WaveWeb.Endpoint
+      WaveWeb.Endpoint,
+      Wave.MessageProducer,
+      Wave.MessageProcessor
+
       # Start a worker by calling: Wave.Worker.start_link(arg)
       # {Wave.Worker, arg}
     ]
