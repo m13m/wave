@@ -50,7 +50,12 @@ defmodule WaveWeb.Router do
     scope "/dev" do
       pipe_through :browser
 
-      live_dashboard "/dashboard", metrics: WaveWeb.Telemetry
+      live_dashboard "/dashboard",
+        metrics: WaveWeb.Telemetry,
+        additional_pages: [
+          broadway: BroadwayDashboard
+        ]
+
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
   end

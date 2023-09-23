@@ -54,10 +54,12 @@ defmodule Wave.MixProject do
       {:earmark, "~> 1.4"},
       {:html_sanitize_ex, "~> 1.4"},
       {:timex, "~> 3.7"},
-      {:broadway, "~> 1.0"},
       {:dns_cluster, "~> 0.1.0"},
       {:req, "~> 0.4.0"},
-      {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false}
+      {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
+      # broadway and friends 
+      {:broadway, "~> 1.0"},
+      {:broadway_dashboard, "~> 0.4.0"}
     ]
   end
 
