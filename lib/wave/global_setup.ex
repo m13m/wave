@@ -19,7 +19,7 @@ defmodule Wave.GlobalSetup do
       room_id: room.id
     })
 
-    IO.puts("your room: #{room.id}")
+    IO.puts("your room: #{room.name}")
   end
 end
 

@@ -1,7 +1,7 @@
 <nav class="bg-[#292828] fixed h-screen w-26  z-50 transition-all hover:w-80 focus:w-80 hover:text-2xl">
   <div class="flex ">
     <h1 class="text-white w-full pl-2 pt-6 pb-6 font-semibold">
-      Channels 
+      Channels
     </h1>
 
     <button phx-click={show_modal("create-room")}>
@@ -33,7 +33,7 @@
 
   <div :for={room <- @rooms} id={"room_#{room.id}"} class="bg-yellow-200">
     <a href="#" phx-click="switch-room" phx-value-room={room.name}>
-      # <%= room.name %> 
+      # <%= room.name %>
     </a>
   </div>
 </nav>

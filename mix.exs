@@ -57,9 +57,12 @@ defmodule Wave.MixProject do
       {:dns_cluster, "~> 0.1.0"},
       {:req, "~> 0.4.0"},
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
-      # broadway and friends 
+      # broadway and friends
+      {:gen_stage, "~> 1.0"},
       {:broadway, "~> 1.0"},
-      {:broadway_dashboard, "~> 0.4.0"}
+      {:broadway_dashboard, "~> 0.4.0"},
+      {:broadway_rabbitmq, "~> 0.6"},
+      {:amqp, "~> 3.3.0"}
     ]
   end
 

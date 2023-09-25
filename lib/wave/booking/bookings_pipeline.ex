@@ -1,0 +1,125 @@
+defmodule Wave.Booking.BookingsPipeline do
+  require Logger
+  alias Wave.Booking.Tickets
+
+  use Broadway
+
+  @producer BroadwayRabbitMQ.Producer
+
+  @producer_config [
+    queue: "bookings_queue",
+    declare: [durable: true],
+    on_failure: :reject_and_requeue,
+    qos: [prefetch_count: 100]
+  ]
+
+  def start_link(_args) do
+    options = [
+      name: __MODULE__,
+      producer: [
+        module: {@producer, @producer_config},
+        concurrency: 1
+      ],
+      processors: [
+        default: [concurrency: System.schedulers() * 2]
+      ],
+      batchers: [
+        cinema: [concurrency: 4],
+        musical: [concurrency: 2],
+        default: [concurrency: 4, batch_size: 75],
+        instant_messages: [concurrency: 2, batch_size: 75]
+      ]
+    ]
+
+    Broadway.start_link(__MODULE__, options)
+  end
+
+  def prepare_messages(messages, _context) do
+    messages =
+      Enum.map(messages, fn message ->
+        Broadway.Message.update_data(message, fn data ->
+          [event, user_id] = String.split(data, ",")
+          %{event: event, user_id: user_id}
+        end)
+      end)
+
+    # load stuff from db although we could have done is grab the user from db in handle_message
+    # itself but that will hammer our db too much degrade the performance
+
+    users = Tickets.users_by_ids(Enum.map(messages, & &1.data.user_id))
+
+    # IO.inspect(users, label: "users")
+
+    Enum.map(messages, fn message ->
+      Broadway.Message.update_data(message, fn data ->
+        user = Enum.find(users, &(&1.id == data.user_id))
+        Map.put(data, :user, user)
+      end)
+    end)
+
+    # %{musical, 1} <- message recv
+    # message recv handle_message callaback
+    # %{event: musical, user_id: 1, user:   %{id: "1", email: "foo@example.com"}}
+  end
+
+  # this can become bootleneck to avoid you could do something like batching
+  def handle_message(_processor, message, _context) do
+    #  if Tickets.tickets_available?(message.data.event) do
+    case message do
+      %{data: %{event: "cinema"}} = message ->
+        Broadway.Message.put_batcher(message, :cinema)
+
+      %{data: %{event: "musical"}} = message ->
+        Broadway.Message.put_batcher(message, :musical)
+
+      message ->
+        message
+    end
+
+    # else
+    #   Broadway.Message.failed(message, "bookings-closed!")
+    # end
+  end
+
+  def handle_batch(:cinema, messages, batch_info, _context) do
+    IO.puts("#{inspect(self())} Batch #{batch_info.batcher} #{batch_info.batch_key}")
+
+    messages
+    |> Tickets.insert_all_tickets()
+    |> Enum.each(fn message ->
+      channel = message.metadata.amqp_channel
+      payload = "instant_message,#{message.data.user.email}"
+      AMQP.Basic.publish(channel, "", "notifications_queue", payload)
+    end)
+
+    messages
+  end
+
+  def handle_batch(_batcher, messages, batch_info, _context) do
+    IO.puts("#{inspect(self())} Batch #{batch_info.batcher} #{batch_info.batch_key}")
+
+    messages
+    |> Tickets.insert_all_tickets()
+    |> Enum.each(fn message ->
+      channel = message.metadata.amqp_channel
+      payload = "email,#{message.data.user.email}"
+      AMQP.Basic.publish(channel, "", "notifications_queue", payload)
+    end)
+
+    messages
+  end
+
+  def handle_failed(messages, _context) do
+    IO.inspect(messages, label: "Failed messages")
+
+    Enum.map(messages, fn
+      # reject messages with the reason "bookings-close"
+      %{status: {:failed, "bookings-closed"}} = message ->
+        Broadway.Message.configure_ack(message, on_failure: :reject)
+
+      # keep retrying the message that has failed
+      message ->
+        message
+    end)
+  end
+end
