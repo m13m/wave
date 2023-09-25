@@ -4,6 +4,7 @@ defmodule Wave.Scraping.PageProducer do
   require Logger
 
   def init(initial_state) do
+    IO.inspect(initial_state)
     Logger.info("PageProducer init")
     {:producer, initial_state, buffer_size: 3}
   end

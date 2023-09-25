@@ -20,5 +20,7 @@ defmodule Wave.Scraping.Scraper do
     |> Process.sleep()
   end
 
+  def online?("google.com"), do: false
+
   def online?(_), do: true
 end

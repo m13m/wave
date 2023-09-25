@@ -11,7 +11,7 @@ defmodule Wave.Scraping.ScrapingPipeline do
     options = [
       name: __MODULE__,
       producer: [
-        module: {PageProducer, []},
+        module: {PageProducer, [1, 2]},
         transformer: {ScrapingPipeline, :transform, []}
       ],
       processors: [
@@ -50,7 +50,9 @@ defmodule Wave.Scraping.ScrapingPipeline do
     }
   end
 
-  def ack(:pages, _successful, _failed) do
+  def ack(:pages, successful, failed) do
+    IO.inspect(successful, label: "successful")
+    IO.inspect(failed, label: "failed")
     :ok
   end
 end
